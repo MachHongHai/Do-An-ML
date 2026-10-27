@@ -10,10 +10,9 @@ giải thích cài đặt, kết quả 2D/8D và so sánh các thuật toán.
 
 ## Chạy notebook
 
-Dùng Python 3.10 trở lên. Cài các thư viện:
+Dùng Python 3.10 trở lên. Chạy các lệnh sau tại thư mục gốc của repository:
 
 ```powershell
-cd BIRCH_Machine_Learning
 python -m pip install -r requirements.txt
 python -m jupyterlab
 ```
@@ -25,7 +24,7 @@ vừa cài thư viện. Notebook chạy trên CPU, không cần dịch vụ bên
 ## Các file
 
 ```text
-BIRCH_Machine_Learning/
+Do-An-ML/
   Do-An-Birch.ipynb
   data/
     khach_hang_2d.csv
@@ -38,6 +37,7 @@ BIRCH_Machine_Learning/
     (các hình PNG dùng trong báo cáo)
   README.md
   requirements.txt
+  .gitignore
 ```
 
 Ba CSV lần lượt có 30.000, 20.000 và 20 dòng. Dữ liệu khách hàng được mô phỏng,
