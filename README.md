@@ -1,74 +1,61 @@
 # Thuật toán phân cụm BIRCH
 
-Mã nguồn và kết quả thực nghiệm nằm trong **Do-An-Birch.ipynb**. Notebook có
-lý thuyết cốt lõi, công thức CF, ví dụ tính tay và giải thích ngắn bên cạnh code.
-BIRCH và weighted K-Means được tự cài đặt; tiền xử lý dùng `StandardScaler`,
-PCA và các chỉ số đánh giá dùng scikit-learn, biểu đồ dùng Matplotlib.
-
-Bài báo cáo **Bao_cao_BIRCH.docx** được lưu riêng trong Documents, trình bày lý thuyết, tính toán bằng tay,
-giải thích cài đặt, kết quả 2D/8D và so sánh các thuật toán.
+Notebook **Do-An-Birch.ipynb** trình bày lý thuyết CF, CF Tree, cài đặt BIRCH bằng
+Python theo hướng đối tượng và minh họa từng bước. BIRCH cùng weighted K-Means
+được tự cài đặt bằng NumPy. StandardScaler và Silhouette dùng scikit-learn;
+các mô hình thư viện được gọi riêng trong phần so sánh.
 
 ## Chạy notebook
 
-Dùng Python 3.10 trở lên. Chạy các lệnh sau tại thư mục gốc của repository:
+Dùng Python 3.10 trở lên. Tại thư mục gốc repository:
 
 ```powershell
 python -m pip install -r requirements.txt
 python -m jupyterlab
 ```
 
-Mở `Do-An-Birch.ipynb`, chọn kernel có đủ thư viện rồi chọn
-**Restart Kernel and Run All**. Có thể mở bằng VS Code và chọn môi trường Python
-vừa cài thư viện. Notebook chạy trên CPU, không cần dịch vụ bên ngoài.
+Mở `Do-An-Birch.ipynb` bằng JupyterLab hoặc VS Code, chọn đúng kernel và chạy
+**Restart Kernel and Run All**. Chương trình chạy trên CPU.
+
+## Nội dung
+
+- Tập 20 điểm: tính CF bằng tay, theo dõi hấp thụ và tách lá, nút trong, gốc.
+- Tập 30.000 khách mô phỏng: phân cụm bằng số đơn và tổng chi tiêu tháng.
+- So sánh BIRCH tự viết, BIRCH thư viện và K-Means trên cùng 3.000 điểm cố định.
+- Thời gian gồm fit và lấy nhãn, đo một lần với một thread; Silhouette dùng
+  chung mẫu cố định 1.200 điểm, tính ngoài phép đo thời gian.
 
 ## Các file
 
 ```text
-Do-An-ML/
-  Do-An-Birch.ipynb
-  data/
-    khach_hang_2d.csv
-    khach_hang_8d.csv
-    minh_hoa_birch.csv
-    data_dictionary.md
-  outputs/
-    benchmark_birch_full.csv
-    benchmark_cung_tap_con.csv
-    (các hình PNG dùng trong báo cáo)
-  README.md
-  requirements.txt
-  .gitignore
+Do-An-Birch.ipynb
+data/
+  khach_hang_2d.csv
+  minh_hoa_birch.csv
+  data_dictionary.md
+outputs/
+  benchmark_2d.csv
+  thong_ke_cum_2d.csv
+  (các hình từ lần chạy notebook)
+README.md
+requirements.txt
 ```
 
-Ba CSV lần lượt có 30.000, 20.000 và 20 dòng. Dữ liệu khách hàng được mô phỏng,
-không dùng dữ liệu cá nhân thật. Notebook đọc trực tiếp ba CSV đã có, không sinh
-hoặc ghi đè dữ liệu đầu vào khi Run All.
-Xem [từ điển dữ liệu](data/data_dictionary.md) để biết đơn vị và quy luật sinh.
+Notebook đọc CSV có sẵn, không sinh dữ liệu khi Run All. Mã khách không đưa vào
+ma trận đặc trưng. Xem [từ điển dữ liệu](data/data_dictionary.md) để biết đơn vị.
+Báo cáo Word được lưu riêng trong Documents; Google Docs trình bày cùng nội dung.
 
-## Cài đặt và đánh giá
+## Phạm vi và giới hạn
 
-BIRCH tự viết gồm ClusteringFeature, CFEntry, CFNode, CFTree và Birch. CF lưu N,
-vector LS và scalar SS; threshold là bán kính RMS sau gộp. Chương trình xử lý
-hấp thụ điểm, tạo entry, tách lá/nút trong/gốc và cập nhật CF cha. Bước cuối
-là weighted K-Means tự viết với trọng số N, không gọi thuật toán clustering có sẵn.
+Code sử dụng vector, có thể xử lý nhiều chiều; thực nghiệm chỉ dùng 2D.
+threshold là bán kính RMS tối đa sau gộp, branching_factor giới hạn số entry
+mỗi nút. K=5 là số cụm đặt trước, chưa tìm K tối ưu. Hai bản BIRCH khác bước
+gom cuối: weighted K-Means tự viết và Agglomerative trong bản thư viện.
 
-Ví dụ nhỏ dùng giá trị thô để tính tay và vẽ trạng thái cây. Dữ liệu lớn dùng
-Z-score bằng `StandardScaler` của scikit-learn. PCA chỉ để vẽ kết quả 8D, không dùng thay dữ liệu phân cụm.
+Chưa cài tái xây cây theo giới hạn bộ nhớ, partial_fit và tinh chỉnh lặp của
+BIRCH nguyên bản. CF Tree nhạy với thang đo, threshold và thứ tự chèn.
+Dữ liệu mô phỏng chưa phản ánh đầy đủ hành vi thực tế. Thời gian đo một lần có
+thể dao động; chưa đo bộ nhớ thực thi.
 
-Hai bản BIRCH được so trên cùng tập dữ liệu đầy đủ. K-Means, DBSCAN và
-Agglomerative được so trên cùng 3.000 dòng cố định cho mỗi dataset. Thời gian
-là trung vị ba lần xây mô hình và lấy nhãn, một thread. Silhouette dùng cùng mẫu
-cố định tối đa 1.200 điểm; bỏ nhiễu DBSCAN khi tính chỉ số này. ARI/NMI vẫn gồm
-nhãn nhiễu. Bảng, hình và nhận xét có số liệu được sinh khi chạy notebook.
-
-## Giới hạn
-
-Chưa cài tái xây cây theo ngân sách bộ nhớ, partial_fit hoặc refinement lặp;
-không tuyên bố đủ bốn pha BIRCH nguyên bản. Dữ liệu giả lập, tham số cố định,
-chưa tối ưu cho từng phương pháp. Hai bản BIRCH khác bước gom cụm cuối nên
-không yêu cầu kết quả trùng nhau. Chưa đo peak RAM đáng tin cậy.
-
-Lần kiểm tra ngày 21/10/2026 dùng Python 3.13.5 và scikit-learn 1.9.0.
-Toàn bộ 19 cell code đã chạy từ kernel sạch, không lỗi; thời gian thực hiện
-khoảng 59 giây trên máy kiểm tra. Các bảng benchmark trong báo cáo dùng kết quả
-của lần chạy này.
+Kiểm tra ngày 30/10/2026: toàn bộ 14 cell code chạy từ kernel sạch, không lỗi,
+trong khoảng 24 giây trên máy kiểm tra. Số liệu benchmark được tạo khi chạy.
